@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List | Thansim</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="background"></div>
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <div class="top-bar">
+      <h1>📝 To-Do List</h1>
+      <button id="toggle-theme">🌗</button>
+    </div>
+
+    <div class="summary">
+      <p>Total Tasks: <span id="total-count">0</span></p>
+      <p>Completed: <span id="completed-count">0</span></p>
+    </div>
+
+    <form id="task-form">
+      <input type="text" id="task-input" placeholder="Enter a new task..." required />
+      <select id="priority-select">
+        <option value="Low">Low 🔵</option>
+        <option value="Medium">Medium 🟡</option>
+        <option value="High">High 🔴</option>
+      </select>
+      <select id="repeat-select">
+        <option value="None">No Repeat</option>
+        <option value="Daily">Daily</option>
+        <option value="Weekly">Weekly</option>
+        <option value="Monthly">Monthly</option>
+        <option value="Yearly">Yearly</option>
+      </select>
+      <input type="date" id="due-date" />
+      <button type="submit">Add</button>
+    </form>
+
+    <ul id="task-list"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
