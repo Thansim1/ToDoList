@@ -3,40 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>To-Do List | Thansim</title>
+  <title>To-Do List</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="background"></div>
   <div id="particles-js"></div>
 
   <div class="container">
     <div class="top-bar">
-      <h1>📝 To-Do List</h1>
-      <button id="toggle-theme">🌗</button>
+      <h1><span>📝</span> <span class="title">To-Do List</span></h1>
+      <button id="toggle-theme" title="Toggle Dark Mode">🌓</button>
     </div>
 
     <div class="summary">
-      <p>Total Tasks: <span id="total-count">0</span></p>
-      <p>Completed: <span id="completed-count">0</span></p>
+      <span>Total Tasks: <span id="total">0</span></span>
+      <span>Completed: <span id="completed">0</span></span>
     </div>
 
     <form id="task-form">
       <input type="text" id="task-input" placeholder="Enter a new task..." required />
-      <select id="priority-select">
-        <option value="Low">Low 🔵</option>
-        <option value="Medium">Medium 🟡</option>
-        <option value="High">High 🔴</option>
+      <select id="priority">
+        <option value="low">Low 🔵</option>
+        <option value="medium">Medium 🟡</option>
+        <option value="high">High 🔴</option>
       </select>
-      <select id="repeat-select">
-        <option value="None">No Repeat</option>
-        <option value="Daily">Daily</option>
-        <option value="Weekly">Weekly</option>
-        <option value="Monthly">Monthly</option>
-        <option value="Yearly">Yearly</option>
+      <select id="repeat">
+        <option value="none">No Repeat</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
       </select>
-      <input type="date" id="due-date" />
-      <button type="submit">Add</button>
+      <div class="date-container">
+        <input type="date" id="due-date" required />
+        <span class="calendar-icon">📅</span>
+      </div>
+      <button type="submit" id="add-btn">Add</button>
     </form>
 
     <ul id="task-list"></ul>
