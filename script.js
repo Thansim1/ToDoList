@@ -1,116 +1,175 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const taskForm = document.getElementById("task-form");
-  const taskInput = document.getElementById("task-input");
-  const taskList = document.getElementById("task-list");
-  const toggleTheme = document.getElementById("toggle-theme");
-  const totalSpan = document.getElementById("total");
-  const completedSpan = document.getElementById("completed");
+const form = document.getElementById("task-form");
+const taskInput = document.getElementById("task-input");
+const prioritySelect = document.getElementById("priority-select");
+const repeatSelect = document.getElementById("repeat-select");
+const dueDateInput = document.getElementById("due-date");
+const taskList = document.getElementById("task-list");
+const totalCount = document.getElementById("total-count");
+const completedCount = document.getElementById("completed-count");
+const toggleTheme = document.getElementById("toggle-theme");
 
-  const priority = document.getElementById("priority");
-  const repeat = document.getElementById("repeat");
-  const dueDate = document.getElementById("due-date");
+function loadParticles() {
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 50 },
+      color: { value: "#ffffff" },
+      shape: { type: "circle" },
+      opacity: { value: 0.4 },
+      size: { value: 3 },
+      line_linked: {
+        enable: true,
+        color: "#ffffff",
+        opacity: 0.4,
+        width: 1
+      },
+      move: { enable: true, speed: 1.2 }
+    },
+    interactivity: {
+      events: { onhover: { enable: true, mode: "repulse" } },
+      modes: { repulse: { distance: 100 } }
+    }
+  });
+}
 
-  let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+const savedTheme = localStorage.getItem("theme") || "light";
+if (savedTheme === "dark") {
+  document.body.classList.add("dark");
+}
+loadParticles();
 
-  function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+toggleTheme.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  const newTheme = document.body.classList.contains("dark") ? "dark" : "light";
+  localStorage.setItem("theme", newTheme);
+  document.getElementById("particles-js").innerHTML = "";
+  loadParticles();
+});
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const text = taskInput.value.trim();
+  const priority = prioritySelect.value;
+  const repeat = repeatSelect.value;
+  const dueDate = dueDateInput.value;
+
+  if (text !== "") {
+    addTask(text, priority, repeat, dueDate);
+    saveTask({ text, completed: false, priority, repeat, dueDate });
+    taskInput.value = "";
+    dueDateInput.value = "";
   }
+});
 
-  function renderTasks() {
-    taskList.innerHTML = "";
-    let completedCount = 0;
+function addTask(text, priority, repeat, dueDate, completed = false) {
+  const li = document.createElement("li");
+  if (completed) li.classList.add("completed");
 
-    tasks.forEach((task, index) => {
-      const li = document.createElement("li");
-      if (task.completed) {
-        li.classList.add("completed");
-        completedCount++;
-      }
+  const top = document.createElement("div");
+  top.className = "task-main";
 
-      li.innerHTML = `
-        <div class="task-main">
-          <span>${task.text}</span>
-          <div>
-            <button onclick="completeTask(${index})">✔️</button>
-            <button onclick="deleteTask(${index})">🗑️</button>
-          </div>
-        </div>
-        <div class="task-meta">
-          <span class="priority-${task.priority}">Priority: ${task.priority}</span>
-          <span>Repeat: ${task.repeat}</span>
-          <span>Due: ${task.dueDate}</span>
-        </div>
-      `;
+  const span = document.createElement("span");
+  span.textContent = text;
+  span.onclick = () => editTask(span);
 
-      taskList.appendChild(li);
-    });
-
-    totalSpan.textContent = tasks.length;
-    completedSpan.textContent = completedCount;
-  }
-
-  window.completeTask = function (index) {
-    tasks[index].completed = !tasks[index].completed;
-    saveTasks();
-    renderTasks();
+  const buttons = document.createElement("span");
+  const doneBtn = document.createElement("button");
+  doneBtn.innerHTML = "✔️";
+  doneBtn.onclick = () => {
+    li.classList.toggle("completed");
+    updateStorage();
   };
 
-  window.deleteTask = function (index) {
-    tasks.splice(index, 1);
-    saveTasks();
-    renderTasks();
+  const delBtn = document.createElement("button");
+  delBtn.innerHTML = "🗑️";
+  delBtn.onclick = () => {
+    li.remove();
+    updateStorage();
   };
 
-  taskForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const text = taskInput.value.trim();
-    if (text === "") return;
+  buttons.appendChild(doneBtn);
+  buttons.appendChild(delBtn);
+  top.appendChild(span);
+  top.appendChild(buttons);
 
+  const meta = document.createElement("div");
+  meta.className = "task-meta";
+  meta.innerHTML = `
+    <span class="priority-${priority.toLowerCase()}">Priority: ${priority}</span>
+    <span>Repeat: ${repeat}</span>
+    ${dueDate ? `<span>Due: ${dueDate}</span>` : ""}
+  `;
+
+  li.appendChild(top);
+  li.appendChild(meta);
+  taskList.appendChild(li);
+  updateSummary();
+}
+
+function editTask(span) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = span.textContent;
+  input.classList.add("editable");
+
+  input.onblur = () => {
+    if (input.value.trim() !== "") {
+      span.textContent = input.value.trim();
+      updateStorage();
+    } else {
+      span.textContent = input.value;
+    }
+    span.onclick = () => editTask(span);
+    input.replaceWith(span);
+  };
+
+  span.replaceWith(input);
+  input.focus();
+}
+
+function getTasks() {
+  return JSON.parse(localStorage.getItem("tasks")) || [];
+}
+
+function saveTask(task) {
+  const tasks = getTasks();
+  tasks.push(task);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  updateSummary();
+}
+
+function loadTasks() {
+  const tasks = getTasks();
+  tasks.forEach(task => {
+    addTask(task.text, task.priority, task.repeat, task.dueDate, task.completed);
+  });
+  updateSummary();
+}
+
+function updateStorage() {
+  const tasks = [];
+  document.querySelectorAll("#task-list li").forEach(li => {
+    const text = li.querySelector(".task-main span").textContent;
+    const priority = li.querySelector(".task-meta span:nth-child(1)").textContent.split(": ")[1];
+    const repeat = li.querySelector(".task-meta span:nth-child(2)").textContent.split(": ")[1];
+    const dueDateText = li.querySelector(".task-meta span:nth-child(3)");
+    const dueDate = dueDateText ? dueDateText.textContent.split(": ")[1] : "";
     tasks.push({
       text,
-      priority: priority.value,
-      repeat: repeat.value,
-      dueDate: dueDate.value,
-      completed: false
+      completed: li.classList.contains("completed"),
+      priority,
+      repeat,
+      dueDate
     });
-
-    taskInput.value = "";
-    dueDate.value = "";
-    saveTasks();
-    renderTasks();
   });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  updateSummary();
+}
 
-  toggleTheme.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-  });
+function updateSummary() {
+  const tasks = document.querySelectorAll("#task-list li");
+  const completed = document.querySelectorAll("#task-list li.completed");
+  totalCount.textContent = tasks.length;
+  completedCount.textContent = completed.length;
+}
 
-  renderTasks();
-});
-
-// Particle background
-particlesJS("particles-js", {
-  particles: {
-    number: { value: 45 },
-    color: { value: "#ffffff" },
-    shape: { type: "circle" },
-    opacity: { value: 0.5 },
-    size: { value: 3 },
-    line_linked: {
-      enable: true,
-      distance: 150,
-      color: "#ffffff",
-      opacity: 0.4,
-      width: 1
-    },
-    move: {
-      enable: true,
-      speed: 2
-    }
-  },
-  interactivity: {
-    events: {
-      onhover: { enable: true, mode: "repulse" }
-    }
-  },
-  retina_detect: true
-});
+window.onload = loadTasks;
