@@ -1,3 +1,4 @@
+/* === Base Reset === */
 * {
   margin: 0;
   padding: 0;
@@ -64,8 +65,6 @@ body.dark .container {
 
 h1 {
   color: #002855;
-  font-size: 1.8rem;
-  white-space: nowrap;
 }
 
 body.dark h1 {
@@ -80,6 +79,10 @@ body.dark h1 {
   color: #002855;
 }
 
+body.dark #toggle-theme {
+  color: #ffea00;
+}
+
 .summary {
   display: flex;
   justify-content: space-between;
@@ -87,12 +90,12 @@ body.dark h1 {
   font-weight: bold;
 }
 
+/* ✅ Vertical layout for form */
 form {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
-  justify-content: center;
 }
 
 input, select {
@@ -100,26 +103,24 @@ input, select {
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  width: 100%;
-  max-width: 100%;
-  flex: 1 1 100%;
+  flex: 1;
 }
 
-#task-input {
-  box-sizing: border-box;
-  width: 100%;
+input[type="date"]::placeholder {
+  color: #888;
 }
 
-input[type="date"]::before {
-  content: attr(placeholder);
-  color: #999;
-  position: absolute;
-  left: 1rem;
-}
+@media (max-width: 768px) {
+  input[type="date"] {
+    font-size: 1rem;
+    background-color: white;
+    color: black;
+  }
 
-input[type="date"]:focus::before,
-input[type="date"]:valid::before {
-  content: "";
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    filter: invert(0);
+  }
 }
 
 button {
@@ -131,7 +132,6 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
-  width: 100%;
 }
 
 button:hover {
@@ -205,41 +205,6 @@ li button:hover {
   color: inherit;
   font-size: 1rem;
   width: 100%;
-}
-
-@media screen and (max-width: 600px) {
-  h1 {
-    font-size: 1.5rem;
-    white-space: nowrap;
-  }
-
-  .container {
-    padding: 1.5rem;
-    width: 100%;
-    margin: 0 1rem;
-  }
-
-  input,
-  select,
-  button {
-    font-size: 1rem;
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  input[type="date"] {
-    appearance: none;
-    padding-right: 2.5rem;
-    position: relative;
-  }
-
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 1;
-  }
 }
 
 @keyframes animatedGradient {
